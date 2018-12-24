@@ -1,38 +1,18 @@
 {
   "name": "portfolio-website",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "My personal website.",
   "scripts": {
-    "compile-pug": "pug --out docs --pretty src/pug -O src/data.js",
-    "compile-sass": "node-sass --output docs/css/ src/sass/",
-    "compile-ts": "rollup -c",
-    "watch-pug": "npm run compile-pug -- -w",
-    "watch-sass": "npm run compile-sass -- -w -r",
-    "watch-ts": "npm run compile-ts -- -w",
-    "serve": "http-server ./docs --silent -c-1",
-    "dev": "npm-run-all --parallel watch-pug watch-sass watch-ts serve",
-    "build": "npm-run-all compile-pug compile-sass compile-ts"
+    "build-clean": "rm docs/*.css docs/*.html docs/*.js && npm run build && git add docs/*.css docs/*.html docs/*.js",
+    "build": "parcel build src/pug/* --out-dir docs --no-source-maps --public-url ./",
+    "watch": "parcel watch src/pug/* --out-dir docs --no-source-maps --public-url ./"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://tannerntannern@bitbucket.org/tannerntannern/portfolio-website.git"
-  },
-  "author": "Tanner Nielsen",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/tannerntannern/portfolio-website#readme",
+  "dependencies": {},
   "devDependencies": {
-    "http-server": "^0.10.0",
-    "micro-observer": "0.0.8",
-    "node-sass": "^4.9.3",
-    "npm-run-all": "^4.1.3",
+    "parcel-bundler": "^1.11.0",
     "pug": "^2.0.3",
-    "pug-cli": "^1.0.0-alpha6",
-    "rollup": "^0.52.3",
-    "rollup-plugin-commonjs": "^8.4.1",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-typescript": "^0.8.1",
-    "rollup-plugin-uglify": "^2.0.1",
-    "typescript": "^2.9.2"
+    "sass": "^1.15.2",
+    "typescript": "^3.2.2"
   },
-  "dependencies": {}
+  "author": "Tanner Nielsen"
 }

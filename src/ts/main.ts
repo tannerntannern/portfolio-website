@@ -1,7 +1,7 @@
 import { Point, Line } from './classes';
 import { MainLoop } from './mainloop';
 import { debounce, distApprox2 } from './util';
-declare var $: any, jQuery: any;
+declare var $: any;
 
 // Initialize canvas demo
 function setup() {
@@ -12,7 +12,7 @@ function setup() {
 	let c = document.querySelector('canvas').getContext('2d');
 
 	// Get width and height
-	let w = document.body.clientWidth,
+	let w = window.innerWidth,
 		h = window.innerHeight;
 
 	// Set width and height
@@ -31,6 +31,8 @@ function setup() {
 
 	// Init colors
 	let colors = {
+		primary: '#347FC4',
+		accent: '#FFFFFF',
 		background1: '#1e1e3c',
 		background2: '#1c3f4a',
 		points: '#ffe699',

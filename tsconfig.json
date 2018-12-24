@@ -2,11 +2,14 @@
   "compilerOptions": {
 	"module": "commonjs",
 	"target": "es5",
-	"project": "src/ts",
+	"lib": ["dom", "es2015", "es6"],
 	"outDir": "docs/js",
 	"allowJs": true,
 	"sourceMap": false
   },
+  "include": [
+	"src/ts"
+  ],
   "exclude": [
 	"node_modules"
   ]

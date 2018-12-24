@@ -1,99 +1,14 @@
-extends ../templates/page
-include ../snippets/under-contruction
-include ../snippets/experience-chart
-include ../snippets/projects-carousel
+doctype html
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport" content="width=device-width, initial-scale=1.0")
 
-block title
-	title Tanner Nielsen - Full-Stack Web Developer
+		title Test Title
 
-block content
-	// Just a placeholder element for the scrollspy plugin to jump to
-	#top-of-page.section.scrollspy(style="height: 0; padding: 0;")
-	#landing-demo
+		link(rel="stylesheet" href="../sass/main.scss")
+	body
 		canvas#canvas
-		#landing-demo-center
-			.hide-on-small-only
-				h1 Hi, I'm #[span.text-accent Tanner Nielsen].
-				h4 I'm a full-stack web developer.
-			.hide-on-med-and-up
-				h3 Hi, I'm #[span.text-accent Tanner Nielsen].
-				h5 I'm a full-stack web developer.
-			a#scroll-down.btn-floating.btn-large.waves-effect(href="#about-me"): i.material-icons arrow_downward
-	#main.block-primary
-		#nav-placeholder
-			include ../snippets/navbar
-		.container
-			#about-me.section.scrollspy
-				.row
-					.col.s12
-						h1.center About Me
-						.row
-							.col.s12.m6.l5.xl4
-								img.responsive-img.circle(src="img/profile.jpg")
-							.col.s12.m6.l7.xl8
-								| I grew up in the small town of Luck, Wisconsin, where I first discovered programming
-								| in the process of trying to build computer games.  Throughout middle and high school
-								| I taught myself various programming languages, and now I'm working on a B.A. in
-								| Computer Science at #[a(href="http://www.drake.edu") Drake University].
-								br
-								br
-								| When I'm not busy with my studies, I'm working on various coding projects.  Currently,
-								| I'm the lead web developer at #[a(href="https://sportslab360.com") SportsLab360].
-								| When I'm not working on school or coding projects, I like to play music.
-						.row
-							h3.center My Experience
-						.row
-							.col.s12
-								+experience-chart("Languages", skills.languages)
-						.row
-							.col.s12
-								+experience-chart("Frameworks/Libraries", skills.frameworks)
-			#my-work.section.scrollspy
-				.row
-					.col.s12
-						h1.center(style="margin-bottom: 0.5em;") My Work
-						+projects-carousel(projects)
-			#contact.section.scrollspy
-				.row
-					.col.s12.center
-						h1 Contact
-						if availableForHire === false
-							p I'm currently too wrapped up in other projects to take on any more work, but feel free to reach out if you'd like to negotiate.
-						else
-							p I'll be looking for work starting in #{availableForHire}.  Let's get in touch!
-						ul.contact-list
-							each contact, type in contacts
-								li
-									a(href= contact.link)
-										i(class= contact.icon)
-										| &nbsp; #{contact.text}
-		include ../snippets/footer
 
-append scripts
-	script(src="js/main.js")
-	script.
-		$(document).ready(function(){
-			// Init pushpin navbar
-			let container = $('#main'), nav = $('#navbar');
-			nav.pushpin({
-				top: container.offset().top,
-				bottom: container.offset().top + container.outerHeight() - nav.height()
-			});
-
-			// Size the nav-placeholder to avoid the jumpy pushpin effect
-			$('#nav-placeholder').css({ height: nav.height() + 'px' });
-
-			// Init scrollspy
-			$('.scrollspy').scrollSpy({
-				scrollOffset: nav.height(),
-				getActiveElement: function(id){
-					return 'ul li[data-section="#' + id + '"]';
-				}
-			});
-
-			// Init projects carousel
-			$('.carousel.carousel-slider').carousel({
-				fullWidth: true,
-				indicators: true
-			});
-		});
+		script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+		script(src="../ts/main.ts")
