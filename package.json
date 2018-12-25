@@ -4,10 +4,11 @@
   "description": "My personal website.",
   "scripts": {
     "build-clean": "rm docs/*.css docs/*.html docs/*.js && npm run build && git add docs/*.css docs/*.html docs/*.js",
-    "build": "parcel build src/pug/* --out-dir docs --no-source-maps --public-url ./",
-    "watch": "parcel watch src/pug/* --out-dir docs --no-source-maps --public-url ./"
+    "build": "parcel build src/pug/* --out-dir docs --no-source-maps --public-url ./"
   },
-  "dependencies": {},
+  "dependencies": {
+    "mainloop.js": "^1.0.4"
+  },
   "devDependencies": {
     "parcel-bundler": "^1.11.0",
     "pug": "^2.0.3",

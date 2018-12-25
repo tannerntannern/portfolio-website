@@ -1,5 +1,5 @@
 import { Point, Line } from './classes';
-import { MainLoop } from './mainloop';
+import * as MainLoop from 'mainloop.js';
 import { debounce, distApprox2 } from './util';
 declare var $: any;
 
@@ -12,7 +12,7 @@ function setup() {
 	let c = document.querySelector('canvas').getContext('2d');
 
 	// Get width and height
-	let w = window.innerWidth,
+	let w = document.body.offsetWidth,
 		h = window.innerHeight;
 
 	// Set width and height
@@ -31,12 +31,8 @@ function setup() {
 
 	// Init colors
 	let colors = {
-		primary: '#347FC4',
-		accent: '#FFFFFF',
-		background1: '#1e1e3c',
-		background2: '#1c3f4a',
-		points: '#ffe699',
-		connectors: '#f8ffbe'
+		accent: '#347FC4',
+		primary: '#FFFFFF'
 	};
 
 	// Init Points
@@ -58,11 +54,6 @@ function setup() {
 		}
 	}
 
-	// Pre-calculate values to cut down on render time
-	let grd = c.createLinearGradient(0, 0, w, h);
-	grd.addColorStop(0, colors.background1);
-	grd.addColorStop(1, colors.background2);
-
 	// Update function
 	function update(delta){
 		// Normalize delta
@@ -83,17 +74,18 @@ function setup() {
 	// Render function
 	function render() {
 		// Background
-		c.fillStyle = grd;
+		c.fillStyle = colors.accent;
 		c.fillRect(-1, -1, w + 2, h + 2);
 
 		// Render points
-		c.fillStyle = colors.points;
+		c.fillStyle = colors.primary;
 		for (let pt of points){
 			c.fillRect(pt.x, pt.y, 2, 2);
 		}
 
 		// Render point connectors
-		c.strokeStyle = colors.connectors;
+		c.strokeStyle = colors.primary;
+		c.lineWidth = 2;
 		for (let ln of lines){
 			let p1 = ln.p1, p2 = ln.p2,
 				lineLengthApprox = distApprox2(p1, p2);
