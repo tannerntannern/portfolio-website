@@ -1,23 +1,27 @@
-import { Point, Line } from './classes';
-import * as MainLoop from 'mainloop.js';
-import { debounce, distApprox2 } from './util';
 declare var $: any;
 
-// Initialize canvas demo
+import regl from 'regl';
+import * as MainLoop from 'mainloop.js';
+
+// @ts-ignore: parcel supports this
+import vert from '../shaders/main.vert';
+// @ts-ignore: parcel supports this
+import frag from '../shaders/main.frag';
+
+import { Point, Line } from './classes';
+import { debounce, distApprox2 } from './util';
+
+// Attach regl to our canvas
+let r = regl();
+
+// Initialize canvas
 function setup() {
 	// Stop the MainLoop if it was already running
 	MainLoop.stop();
 
-	// Grab canvas context
-	let c = document.querySelector('canvas').getContext('2d');
-
 	// Get width and height
 	let w = document.body.offsetWidth,
 		h = window.innerHeight;
-
-	// Set width and height
-	c.canvas.width = w;
-	c.canvas.height = h;
 
 	// Global vars
 	let ptDist = 130,
@@ -31,74 +35,53 @@ function setup() {
 
 	// Init colors
 	let colors = {
-		accent: '#347FC4',
+		accent: '#3172b4',
 		primary: '#FFFFFF'
 	};
 
 	// Init Points
-	let points = [], spd = 0.5, spd2 = spd / 2;
+	let points = [],
+		speeds = [],
+		spd = 0.5, spd2 = spd / 2;
 	for (let i = 0; i < numPoints; i ++){
-		points[i] = new Point(
-			Math.random() * bigW,
-			Math.random() * bigH,
+		points[i] = [
+			((2 * Math.random()) - 1) * (bigW / w),
+			((2 * Math.random()) - 1) * (bigH / h)
+		];
+		speeds[i] = [
 			(Math.random() * spd - spd2) + spd,
 			Math.random() * spd - spd2
-		);
+		];
 	}
 
-	// Init Lines
-	let lines = [];
-	for (let i = 0; i < numPoints; i ++) {
-		for (let j = i; j < numPoints; j ++) {
-			lines.push(new Line(points[i], points[j]));
-		}
-	}
+	let uniforms = {
+		time: 0
+	};
 
 	// Update function
 	function update(delta){
-		// Normalize delta
-		delta /= 20;
-
-		// Update point locations
-		for (let pt of points) {
-			pt.x += delta * pt.xSpeed;
-			pt.y += delta * pt.ySpeed;
-
-			if (pt.x < -ptDist) pt.x += bigW;
-			if (pt.x > edgeX) pt.x -= bigW;
-			if (pt.y < -ptDist) pt.y += bigH;
-			if (pt.y > edgeY) pt.y -= bigH;
-		}
+		uniforms.time += 0.005;
 	}
 
 	// Render function
 	function render() {
-		// Background
-		c.fillStyle = colors.accent;
-		c.fillRect(-1, -1, w + 2, h + 2);
+		r.clear({
+			color: [1, 1, 1, 1],
+			depth: 1,
+			stencil: 0
+		});
 
-		// Render points
-		c.fillStyle = colors.primary;
-		for (let pt of points){
-			c.fillRect(pt.x, pt.y, 2, 2);
-		}
-
-		// Render point connectors
-		c.strokeStyle = colors.primary;
-		c.lineWidth = 2;
-		for (let ln of lines){
-			let p1 = ln.p1, p2 = ln.p2,
-				lineLengthApprox = distApprox2(p1, p2);
-
-			if (lineLengthApprox < ptDist){
-				c.globalAlpha = 1 - (lineLengthApprox / ptDist);
-				c.beginPath();
-				c.moveTo(p1.x, p1.y);
-				c.lineTo(p2.x, p2.y);
-				c.stroke();
-			}
-		}
-		c.globalAlpha = 1;
+		r({
+			frag: frag,
+			vert: vert,
+			uniforms: uniforms,
+			attributes: {
+				position: points,
+				speed: speeds
+			},
+			primitive: 'lines',
+			count: points.length
+		})();
 	}
 
 	// Kick off main loop
@@ -113,7 +96,6 @@ function setup() {
 setup();
 
 $(window)
-	.on('resize', debounce(setup, 200))
 	.on("blur focus", function(e) {
 		let prevType = $(this).data("prevType");
 
