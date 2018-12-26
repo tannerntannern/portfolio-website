@@ -22,6 +22,13 @@ export function debounce(func: Function, wait: number, immediate?: boolean) {
 }
 
 /**
+ * Returns a random number between the given min and max.
+ */
+export function randomRange(min: number, max: number): number {
+	return Math.random() * (max - min) + min;
+}
+
+/**
  * Distance approximation function, based on octagons.
  *
  * https://gist.github.com/aurbano/4693462

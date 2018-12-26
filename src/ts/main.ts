@@ -7,8 +7,7 @@ import pointVert from '../shaders/point.vert';
 // @ts-ignore: parcel supports this
 import pointFrag from '../shaders/point.frag';
 
-import { Point, Line } from './classes';
-import { debounce, distApprox2 } from './util';
+import { debounce, distApprox2, randomRange } from './util';
 
 // Attach regl to our canvas
 let r = regl();
@@ -20,14 +19,13 @@ function setup() {
 		h = window.innerHeight;
 
 	// Global vars
-	let ptDist = 130,
+	let ptDist = 0.1,
+		sizeWithPadding = 1 + ptDist,
 		pixelsPerPoint = 1900,
 		numPointsMax = 1000,
 		numPoints = Math.min(Math.round((w * h) / pixelsPerPoint), numPointsMax),
-		edgeX = w + ptDist,
-		edgeY = h + ptDist,
-		bigW = w + (2 * ptDist),
-		bigH = h + (2 * ptDist);
+		maxSpd = 0.5,
+		minSpd = maxSpd / 2;
 
 	// Init colors
 	let colors = {
@@ -36,29 +34,31 @@ function setup() {
 	};
 
 	// Init Points
-	let points = [],
-		speeds = [],
-		spd = 0.5, spd2 = spd / 2;
+	let points = [], speeds = [];
 	for (let i = 0; i < numPoints; i ++){
 		points[i] = [
-			((2 * Math.random()) - 1) * (bigW / w),
-			((2 * Math.random()) - 1) * (bigH / h)
+			randomRange(-sizeWithPadding, sizeWithPadding),
+			randomRange(-sizeWithPadding, sizeWithPadding)
 		];
 		speeds[i] = [
-			(Math.random() * spd - spd2) + spd,
-			Math.random() * spd - spd2
+			randomRange(minSpd, maxSpd),
+			randomRange(-minSpd, minSpd)
 		];
 	}
 
-	let uniforms = {
-		time: 0
-	};
+	let dynamicUniforms = {
+			time: 0
+		},
+		constantUniforms = {
+
+		};
 
 	const drawPoints = r({
 		frag: pointFrag,
 		vert: pointVert,
 		uniforms: {
-			time: () => uniforms.time
+			time: () => dynamicUniforms.time,
+			...constantUniforms
 		},
 		attributes: {
 			position: points,
@@ -70,7 +70,7 @@ function setup() {
 
 	// Render function
 	r.frame(() => {
-		uniforms.time += 0.005;
+		dynamicUniforms.time += 0.002;
 
 		r.clear({
 			color: [1, 1, 1, 1],
