@@ -1,12 +1,11 @@
 declare var $: any;
 
 import regl from 'regl';
-import * as MainLoop from 'mainloop.js';
 
 // @ts-ignore: parcel supports this
-import vert from '../shaders/main.vert';
+import pointVert from '../shaders/point.vert';
 // @ts-ignore: parcel supports this
-import frag from '../shaders/main.frag';
+import pointFrag from '../shaders/point.frag';
 
 import { Point, Line } from './classes';
 import { debounce, distApprox2 } from './util';
@@ -16,9 +15,6 @@ let r = regl();
 
 // Initialize canvas
 function setup() {
-	// Stop the MainLoop if it was already running
-	MainLoop.stop();
-
 	// Get width and height
 	let w = document.body.offsetWidth,
 		h = window.innerHeight;
@@ -58,57 +54,33 @@ function setup() {
 		time: 0
 	};
 
-	// Update function
-	function update(delta){
-		uniforms.time += 0.005;
-	}
+	const drawPoints = r({
+		frag: pointFrag,
+		vert: pointVert,
+		uniforms: {
+			time: () => uniforms.time
+		},
+		attributes: {
+			position: points,
+			speed: speeds
+		},
+		primitive: 'points',
+		count: points.length
+	});
 
 	// Render function
-	function render() {
+	r.frame(() => {
+		uniforms.time += 0.005;
+
 		r.clear({
 			color: [1, 1, 1, 1],
 			depth: 1,
 			stencil: 0
 		});
 
-		r({
-			frag: frag,
-			vert: vert,
-			uniforms: uniforms,
-			attributes: {
-				position: points,
-				speed: speeds
-			},
-			primitive: 'lines',
-			count: points.length
-		})();
-	}
-
-	// Kick off main loop
-	MainLoop
-		.setMaxAllowedFPS(80)
-		.setUpdate(update)
-		.setDraw(render)
-		.start();
+		drawPoints();
+	});
 }
 
 // Setup once at the beginning
 setup();
-
-$(window)
-	.on("blur focus", function(e) {
-		let prevType = $(this).data("prevType");
-
-		if (prevType != e.type) {
-			switch (e.type) {
-				case "blur":
-					MainLoop.stop();
-					break;
-				case "focus":
-					MainLoop.start();
-					break;
-			}
-		}
-
-		$(this).data("prevType", e.type);
-	});
