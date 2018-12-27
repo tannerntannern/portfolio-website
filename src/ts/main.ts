@@ -3,11 +3,15 @@ declare var $: any;
 import regl from 'regl';
 
 // @ts-ignore: parcel supports this
+import defaultVert from '../shaders/default.vert';
+// @ts-ignore: parcel supports this
 import pointVert from '../shaders/point.vert';
 // @ts-ignore: parcel supports this
-import pointFrag from '../shaders/point.frag';
+import primaryFrag from '../shaders/primary.frag';
+// @ts-ignore: parcel supports this
+import accentFrag from '../shaders/accent.frag';
 
-import { debounce, distApprox2, randomRange } from './util';
+import { debounce, distApprox2, randomRange, hexToVec } from './util';
 
 // Attach regl to our canvas
 let r = regl();
@@ -30,7 +34,7 @@ function setup() {
 	// Init colors
 	let colors = {
 		accent: '#3172b4',
-		primary: '#FFFFFF'
+		primary: '#ffffff'
 	};
 
 	// Init Points
@@ -50,12 +54,29 @@ function setup() {
 			time: 0
 		},
 		constantUniforms = {
-
+			size: sizeWithPadding,
+			fullSize: sizeWithPadding * 2,
+			xDivide: 0,
+			colorAccent: hexToVec(colors.accent),
+			colorPrimary: hexToVec(colors.primary)
 		};
 
+	const drawBg = r({
+		vert: defaultVert,
+		frag: primaryFrag,
+		uniforms: {
+			...constantUniforms
+		},
+		attributes: {
+			position: [[-1, 1], [1, 1], [-1, -1], [1, -1]]
+		},
+		primitive: 'triangle strip',
+		count: 4
+	});
+
 	const drawPoints = r({
-		frag: pointFrag,
 		vert: pointVert,
+		frag: accentFrag,
 		uniforms: {
 			time: () => dynamicUniforms.time,
 			...constantUniforms
@@ -73,12 +94,13 @@ function setup() {
 		dynamicUniforms.time += 0.002;
 
 		r.clear({
-			color: [1, 1, 1, 1],
+			color: [1, .5, 1, 1],
 			depth: 1,
 			stencil: 0
 		});
 
 		drawPoints();
+		drawBg();
 	});
 }
 

@@ -29,6 +29,19 @@ export function randomRange(min: number, max: number): number {
 }
 
 /**
+ * Converts the given hex color into an array of color components.
+ */
+export function hexToVec(hexString: string): [number, number, number] {
+	// Separate the individual components
+	var components = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/.exec(hexString).slice(1, 4);
+
+	// Convert each component to a decimal
+	return <[number, number, number]> components.map(function(comp) {
+		return parseInt(comp, 16) / 255;
+	});
+}
+
+/**
  * Distance approximation function, based on octagons.
  *
  * https://gist.github.com/aurbano/4693462
