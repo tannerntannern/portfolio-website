@@ -7,9 +7,7 @@ import defaultVert from '../shaders/default.vert';
 // @ts-ignore: parcel supports this
 import pointVert from '../shaders/point.vert';
 // @ts-ignore: parcel supports this
-import primaryFrag from '../shaders/primary.frag';
-// @ts-ignore: parcel supports this
-import accentFrag from '../shaders/accent.frag';
+import invertFrag from '../shaders/invert.frag';
 
 import { debounce, distApprox2, randomRange, hexToVec } from './util';
 
@@ -56,16 +54,16 @@ function setup() {
 		constantUniforms = {
 			size: sizeWithPadding,
 			fullSize: sizeWithPadding * 2,
-			xDivide: 0,
-			colorAccent: hexToVec(colors.accent),
-			colorPrimary: hexToVec(colors.primary)
+			xDivide: 0
 		};
 
 	const drawBg = r({
 		vert: defaultVert,
-		frag: primaryFrag,
+		frag: invertFrag,
 		uniforms: {
-			...constantUniforms
+			...constantUniforms,
+			color1: hexToVec(colors.accent),
+			color2: hexToVec(colors.primary)
 		},
 		attributes: {
 			position: [[-1, 1], [1, 1], [-1, -1], [1, -1]]
@@ -76,16 +74,18 @@ function setup() {
 
 	const drawPoints = r({
 		vert: pointVert,
-		frag: accentFrag,
+		frag: invertFrag,
 		uniforms: {
 			time: () => dynamicUniforms.time,
-			...constantUniforms
+			...constantUniforms,
+			color1: hexToVec(colors.primary),
+			color2: hexToVec(colors.accent)
 		},
 		attributes: {
 			position: points,
 			speed: speeds
 		},
-		primitive: 'points',
+		primitive: 'lines',
 		count: points.length
 	});
 
