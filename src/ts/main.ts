@@ -5,9 +5,11 @@ import regl from 'regl';
 // @ts-ignore: parcel supports this
 import defaultVert from '../shaders/default.vert';
 // @ts-ignore: parcel supports this
+import defaultFrag from '../shaders/default.frag';
+// @ts-ignore: parcel supports this
 import pointVert from '../shaders/point.vert';
 // @ts-ignore: parcel supports this
-import invertFrag from '../shaders/invert.frag';
+import pointFrag from '../shaders/point.frag';
 
 import { debounce, distApprox2, randomRange, hexToVec } from './util';
 
@@ -59,7 +61,7 @@ function setup() {
 
 	const drawBg = r({
 		vert: defaultVert,
-		frag: invertFrag,
+		frag: defaultFrag,
 		uniforms: {
 			...constantUniforms,
 			color1: hexToVec(colors.accent),
@@ -74,7 +76,7 @@ function setup() {
 
 	const drawPoints = r({
 		vert: pointVert,
-		frag: invertFrag,
+		frag: pointFrag,
 		uniforms: {
 			time: () => dynamicUniforms.time,
 			...constantUniforms,
@@ -85,7 +87,7 @@ function setup() {
 			position: points,
 			speed: speeds
 		},
-		primitive: 'lines',
+		primitive: 'points',
 		count: points.length
 	});
 
