@@ -38,7 +38,7 @@ function setup() {
 	};
 
 	// Init Points
-	let points = [], speeds = [];
+	let points = [], speeds = [], sizes = [];
 	for (let i = 0; i < numPoints; i ++){
 		points[i] = [
 			randomRange(-sizeWithPadding, sizeWithPadding),
@@ -48,6 +48,7 @@ function setup() {
 			randomRange(minSpd, maxSpd),
 			randomRange(-minSpd, minSpd)
 		];
+		sizes[i] = randomRange(2.0, 5.0);
 	}
 
 	let dynamicUniforms = {
