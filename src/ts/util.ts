@@ -42,6 +42,15 @@ export function hexToVec(hexString: string): [number, number, number] {
 }
 
 /**
+ * Given a number, returns a power of two that is equal or greater to the given number.
+ */
+export function nearestUpperPowerOf2(n: number): number {
+	let nearest = 1 << 31 - Math.clz32(n);
+	if (n > nearest) nearest = nearest << 1;
+	return nearest;
+}
+
+/**
  * Converts a WebGL Texture to a data uri image for testing purposes.
  */
 export function createImageFromTexture(gl, texture, width, height) {
