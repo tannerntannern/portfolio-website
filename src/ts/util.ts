@@ -42,6 +42,37 @@ export function hexToVec(hexString: string): [number, number, number] {
 }
 
 /**
+ * Converts a WebGL Texture to a data uri image for testing purposes.
+ */
+export function createImageFromTexture(gl, texture, width, height) {
+	// Create a framebuffer backed by the texture
+	let framebuffer = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+	// Read the contents of the framebuffer
+	let data = new Float32Array(width * height * 4);
+	gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, data);
+	gl.deleteFramebuffer(framebuffer);
+
+	// Convert the data from floats to ints
+	let intData = Uint8Array.from(data, (v, k) => 255 * v);
+
+	// Create a 2D canvas to store the result
+	let canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+	let context = canvas.getContext('2d');
+
+	// Copy the pixels to a 2D canvas
+	let imageData = context.createImageData(width, height);
+	imageData.data.set(intData);
+	context.putImageData(imageData, 0, 0);
+
+	return canvas.toDataURL();
+}
+
+/**
  * Distance approximation function, based on octagons.
  *
  * https://gist.github.com/aurbano/4693462
