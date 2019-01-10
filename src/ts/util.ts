@@ -42,6 +42,18 @@ export function hexToVec(hexString: string): [number, number, number] {
 }
 
 /**
+ * REGL doesn't like uniforms that look like `uniformName: ['val1', 'val2', ...]`, so instead we have to convert it to
+ * a stupid-ass format.
+ */
+export function reglUniformArray(name: string, data: any[]): {[key: string]: any} {
+	let result = {};
+	for (let i = 0; i < data.length; i ++) {
+		result[`${name}[${i}]`] = data[i];
+	}
+	return result;
+}
+
+/**
  * Given a number, returns a power of two that is equal or greater to the given number.
  */
 export function nearestUpperPowerOf2(n: number): number {

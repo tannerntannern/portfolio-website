@@ -16,10 +16,10 @@ void main() {
 
 	int i = int(index);
 	vec2 uv = vec2(pointTextureXCoords[i], pointTextureYCoords[i]);
-//	vec4 point = texture2D(pointTexture, uv).rgba;
+	vec4 point = texture2D(pointTexture, uv).rgba;
 
-	gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
-	frag_VertCoord = vec2(0.0, 0.0);
+	gl_Position = vec4(point.r, point.b, 0.0, 1.0);
+	frag_VertCoord = vec2(point.r, point.b);
 
 //	gl_Position = vec4(
 //		mod(position.x + (speed.x * time) + size, fullSize) - size,

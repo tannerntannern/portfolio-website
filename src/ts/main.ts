@@ -20,7 +20,7 @@ const shaders = {
 	point: { vert: pointVert, frag: pointFrag }
 };
 
-import {randomRange, hexToVec, nearestUpperPowerOf2, createImageFromTexture} from './util';
+import {randomRange, hexToVec, nearestUpperPowerOf2, createImageFromTexture, reglUniformArray} from './util';
 
 // Attach regl to our canvas
 let r = regl({
@@ -110,8 +110,8 @@ let r = regl({
 		},
 		constantUniforms = {
 			pointTexture: pointTexture,
-			pointTextureXCoords: pointTextureXCoords,
-			pointTextureYCoords: pointTextureYCoords,
+			...reglUniformArray('pointTextureXCoords', pointTextureXCoords),
+			...reglUniformArray('pointTextureYCoords', pointTextureYCoords),
 			canvasWidth: sizeWithPadding,
 			fullCanvasWidth: sizeWithPadding * 2,
 			xDivide: 0
