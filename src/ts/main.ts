@@ -1,19 +1,24 @@
 import regl from 'regl';
 
-// TODO: detect if webgl 2.0 is supported and load the more efficient shaders
-
 // @ts-ignore: parcel supports this
 import defaultVert from '../shaders/default.vert';
 // @ts-ignore: parcel supports this
 import defaultFrag from '../shaders/default.frag';
 // @ts-ignore: parcel supports this
-import pointSimVert from '../shaders/point-sim.vert';
+// import pointSimVert from '../shaders/point-sim.vert';
 // @ts-ignore: parcel supports this
-import pointSimFrag from '../shaders/point-sim.frag';
+// import pointSimFrag from '../shaders/point-sim.frag';
 // @ts-ignore: parcel supports this
 import pointVert from '../shaders/point.vert';
 // @ts-ignore: parcel supports this
 import pointFrag from '../shaders/point.frag';
+
+// Collect our shaders into one object to organize them, and to allow substitutions to be made
+const shaders = {
+	default: { vert: defaultVert, frag: defaultFrag },
+	// pointSim: { vert: pointSimVert, frag: pointSimFrag },
+	point: { vert: pointVert, frag: pointFrag }
+};
 
 import {randomRange, hexToVec, nearestUpperPowerOf2, createImageFromTexture} from './util';
 
@@ -41,8 +46,11 @@ let r = regl({
 
 	let sizeWithPadding = 1 + ptDist,
 		numPoints = Math.min(Math.round((w * h) / pixelsPerPoint), maxPoints),
-		pointTextureSize = nearestUpperPowerOf2(Math.ceil(Math.sqrt(numPoints))),	// Force texture sizes to be powers of 2
-		distanceTextureSize = nearestUpperPowerOf2(Math.ceil(numPoints / 8));
+		pointTextureSize = Math.ceil(Math.sqrt(numPoints)),
+		distanceTextureSize = Math.ceil(numPoints / 8);
+
+	// Because GLSL ES 2.0 is terrible, we have to manually substitute in numPoints
+	shaders.point.vert = shaders.point.vert.replace('#define NUM_POINTS 100', '#define NUM_POINTS ' + numPoints);
 
 	// Generate a bunch of points at random positions moving at random speeds
 	let pointData = [];
@@ -70,6 +78,9 @@ let r = regl({
 		data: pointData
 	});
 
+	// @ts-ignore
+	// console.log(createImageFromTexture(r._gl, pointTexture._texture.texture, pointTextureSize, pointTextureSize));
+
 	// TODO: generate distanceTexture
 
 	// Generate point and line "pointers" to be used by the shaders; These "pointers" will be used to lookup the actual
@@ -83,22 +94,32 @@ let r = regl({
 		}
 	}
 
+	// Pre-compute the texture coordinates for each point since the textures will be used for lookups constantly
+	let pointTextureXCoords = [],
+		pointTextureYCoords = [],
+		distanceTextureCoordMap = [];
+	for (let i = 0; i < numPoints; i ++) {
+		pointTextureXCoords[i] = i % pointTextureSize;
+		pointTextureYCoords[i] = Math.floor(i / pointTextureSize);
+	}
+
+	// TODO: compute distance coordinates
+
 	let dynamicUniforms = {
 			// ...
 		},
 		constantUniforms = {
 			pointTexture: pointTexture,
-			pointTextureWidth: pointTextureSize,
-			pointTextureWidthLog2: Math.log2(pointTextureSize),
-			distanceTextureWidth: distanceTextureSize,
+			pointTextureXCoords: pointTextureXCoords,
+			pointTextureYCoords: pointTextureYCoords,
 			canvasWidth: sizeWithPadding,
 			fullCanvasWidth: sizeWithPadding * 2,
 			xDivide: 0
 		};
 
 	const drawBg = r({
-		vert: defaultVert,
-		frag: defaultFrag,
+		vert: shaders.default.vert,
+		frag: shaders.default.frag,
 		uniforms: {
 			...constantUniforms,
 			color1: hexToVec(colors.accent),
@@ -112,8 +133,8 @@ let r = regl({
 	});
 
 	const drawPoints = r({
-		vert: pointVert,
-		frag: pointFrag,
+		vert: shaders.point.vert,
+		frag: shaders.point.frag,
 		uniforms: {
 			...constantUniforms,
 			color1: hexToVec(colors.primary),
