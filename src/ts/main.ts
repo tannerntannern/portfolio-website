@@ -99,8 +99,8 @@ let r = regl({
 		pointTextureYCoords = [],
 		distanceTextureCoordMap = [];
 	for (let i = 0; i < numPoints; i ++) {
-		pointTextureXCoords[i] = i % pointTextureSize;
-		pointTextureYCoords[i] = Math.floor(i / pointTextureSize);
+		pointTextureXCoords[i] = (i % pointTextureSize) / pointTextureSize;
+		pointTextureYCoords[i] = Math.floor(i / pointTextureSize) / pointTextureSize;
 	}
 
 	// TODO: compute distance coordinates

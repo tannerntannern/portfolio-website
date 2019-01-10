@@ -2,8 +2,8 @@
 #define NUM_POINTS 100
 
 uniform sampler2D pointTexture;
-uniform int pointTextureXCoords[NUM_POINTS];
-uniform int pointTextureYCoords[NUM_POINTS];
+uniform float pointTextureXCoords[NUM_POINTS];
+uniform float pointTextureYCoords[NUM_POINTS];
 uniform float canvasWidth;
 uniform float fullCanvasWidth;
 
@@ -18,8 +18,8 @@ void main() {
 	vec2 uv = vec2(pointTextureXCoords[i], pointTextureYCoords[i]);
 	vec4 point = texture2D(pointTexture, uv).rgba;
 
-	gl_Position = vec4(point.r, point.b, 0.0, 1.0);
-	frag_VertCoord = vec2(point.r, point.b);
+	gl_Position = vec4(point.r, point.g, 0.0, 1.0);
+	frag_VertCoord = vec2(point.r, point.g);
 
 //	gl_Position = vec4(
 //		mod(position.x + (speed.x * time) + size, fullSize) - size,
