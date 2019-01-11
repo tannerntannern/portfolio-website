@@ -2,8 +2,7 @@
 #define NUM_POINTS 100
 
 uniform sampler2D pointTexture;
-uniform float pointTextureXCoords[NUM_POINTS];
-uniform float pointTextureYCoords[NUM_POINTS];
+uniform vec2 pointFBOCoords[NUM_POINTS];
 uniform float canvasWidth;
 uniform float fullCanvasWidth;
 
@@ -14,7 +13,7 @@ varying vec4 pixelData;
 void main() {
 	// Extract the point position and speed from the texture data
 	int i = int(index);
-	vec2 uv = vec2(pointTextureXCoords[i], pointTextureYCoords[i]);
+	vec2 uv = pointFBOCoords[i];
 	vec4 point = texture2D(pointTexture, uv).rgba;
 
 	// Simulate a step of time

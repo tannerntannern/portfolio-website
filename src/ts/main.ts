@@ -25,7 +25,7 @@ const shaders = {
 
 // Attach regl to our canvas
 let r = regl({
-	extensions: ['OES_texture_half_float']
+	extensions: ['OES_texture_float']
 });
 
 // Get width and height
@@ -74,7 +74,7 @@ let pointFBO = new DoubleFBO(r, {
 	width: pointTextureSize,
 	height: pointTextureSize,
 	format: 'rgba',
-	type: 'half float',
+	type: 'float',
 	data: pointData
 });
 
@@ -88,7 +88,7 @@ let distanceFBO = new DoubleFBO(r, {
 	width: distanceTextureSize,
 	height: distanceTextureSize,
 	format: 'rgba',
-	type: 'half float'
+	type: 'float'
 });
 
 // Generate point and line "pointers" to be used by the shaders; These "pointers" will be used to lookup the actual
@@ -103,12 +103,13 @@ for (let i = 0; i < numPoints; i ++) {
 }
 
 // Pre-compute the texture coordinates for each point since the textures will be used for lookups constantly
-let pointTextureXCoords = [], pointTextureYCoords = [],
-	distanceTextureXCoords = [], distanceTextureYCoords = [];
+let pointFBOCoords = [], distanceFBOCoords = [];
 for (let i = 0; i < numPoints; i ++) {
 	// The 0.5 ensures that we use the center of the pixel rather than the top left
-	pointTextureXCoords[i] = ((i % pointTextureSize) + 0.5) / pointTextureSize;
-	pointTextureYCoords[i] = (Math.floor(i / pointTextureSize) + 0.5) / pointTextureSize;
+	pointFBOCoords[i] = [
+		((i % pointTextureSize) + 0.5) / pointTextureSize,
+		(Math.floor(i / pointTextureSize) + 0.5) / pointTextureSize
+	];
 }
 
 // TODO: compute distance coordinates
@@ -118,10 +119,8 @@ let dynamicUniforms = {
 		distanceTexture: () => distanceFBO.current,
 	},
 	constantUniforms = {
-		...reglUniformArray('pointTextureXCoords', pointTextureXCoords),
-		...reglUniformArray('pointTextureYCoords', pointTextureYCoords),
-		...reglUniformArray('distanceTextureXCoords', distanceTextureXCoords),
-		...reglUniformArray('distanceTextureYCoords', distanceTextureYCoords),
+		...reglUniformArray('pointFBOCoords', pointFBOCoords),
+		...reglUniformArray('distanceFBOCoords', distanceFBOCoords),
 		canvasWidth: sizeWithPadding,
 		fullCanvasWidth: sizeWithPadding * 2,
 		xDivide: 0

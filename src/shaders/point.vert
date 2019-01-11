@@ -2,8 +2,7 @@
 #define NUM_POINTS 100
 
 uniform sampler2D pointTexture;
-uniform float pointTextureXCoords[NUM_POINTS];
-uniform float pointTextureYCoords[NUM_POINTS];
+uniform vec2 pointFBOCoords[NUM_POINTS];
 
 attribute float index;
 
@@ -13,7 +12,7 @@ void main() {
 	gl_PointSize = 5.0;
 
 	int i = int(index);
-	vec2 uv = vec2(pointTextureXCoords[i], pointTextureYCoords[i]);
+	vec2 uv = pointFBOCoords[i];
 	vec4 point = texture2D(pointTexture, uv).rgba;
 
 	gl_Position = vec4(point.rg, 0.0, 1.0);
