@@ -65,7 +65,11 @@ export function nearestUpperPowerOf2(n: number): number {
 /**
  * Converts a WebGL Texture to a data uri image for testing purposes.
  */
-export function createImageFromTexture(gl, texture, width, height) {
+export function createImageFromTexture(gl, tex) {
+	let width = tex._texture.width,
+		height = tex._texture.height,
+		texture = tex._texture.texture;
+
 	// Create a framebuffer backed by the texture
 	let framebuffer = gl.createFramebuffer();
 	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
@@ -73,7 +77,7 @@ export function createImageFromTexture(gl, texture, width, height) {
 
 	// Read the contents of the framebuffer
 	let data = new Float32Array(width * height * 4);
-	gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, data);
+	gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, data); // TODO: this may not work quite right anymore now that half-floats are used
 	gl.deleteFramebuffer(framebuffer);
 
 	// Convert the data from floats to ints
