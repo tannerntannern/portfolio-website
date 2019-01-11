@@ -36,7 +36,7 @@ let w = document.body.offsetWidth,
 const ptDist = 0.1,
 	pixelsPerPoint = 1200,
 	maxPoints = 2000,
-	maxSpd = 0.5,
+	maxSpd = 0.002,
 	minSpd = maxSpd / 2,
 	colors = {
 		accent: '#3172b4',
@@ -78,9 +78,9 @@ let pointFBO = new DoubleFBO(r, {
 	data: pointData
 });
 
-function print(which: string = 'current') {
+function print(fb) {
 	// @ts-ignore
-	console.log(createImageFromTexture(r._gl, pointFBO[which].color[0]));
+	console.log(createImageFromTexture(r._gl, fb.color[0]));
 }
 
 // TODO: not sure if we'll actually need this
@@ -106,8 +106,9 @@ for (let i = 0; i < numPoints; i ++) {
 let pointTextureXCoords = [], pointTextureYCoords = [],
 	distanceTextureXCoords = [], distanceTextureYCoords = [];
 for (let i = 0; i < numPoints; i ++) {
-	pointTextureXCoords[i] = (i % pointTextureSize) / pointTextureSize;
-	pointTextureYCoords[i] = Math.floor(i / pointTextureSize) / pointTextureSize;
+	// The 0.5 ensures that we use the center of the pixel rather than the top left
+	pointTextureXCoords[i] = ((i % pointTextureSize) + 0.5) / pointTextureSize;
+	pointTextureYCoords[i] = (Math.floor(i / pointTextureSize) + 0.5) / pointTextureSize;
 }
 
 // TODO: compute distance coordinates
@@ -178,20 +179,24 @@ const drawPoints = r({
 
 // Render function
 r.frame(() => {
+// window.onkeypress = function() {
 	r.clear({
 		color: [1, 1, 1, 1],
 		depth: 1,
 		stencil: 0
 	});
 
-	simulatePoints();
-
 	drawPoints();
 	// drawLines();
 	drawBg();
 
+	// print(pointFBO.current);
+	// print(pointFBO.next);
+	simulatePoints();
+
 	pointFBO.swap();
 	distanceFBO.swap();
+// };
 });
 
 

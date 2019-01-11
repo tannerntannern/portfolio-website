@@ -18,14 +18,15 @@ void main() {
 	vec4 point = texture2D(pointTexture, uv).rgba;
 
 	// Simulate a step of time
-	float newX = /*point.r + point.b*/ 0.0;
-	float newY = /*point.g + point.a*/ 0.0;
+	float newX = point.r + point.b;
+	float newY = point.g + point.a;
 
 	// Wrap around the screen
 	if (newX > canvasWidth) newX -= fullCanvasWidth;
 	if (newY > canvasWidth) newY -= fullCanvasWidth;
 	else if (newY < canvasWidth) newY += fullCanvasWidth;
 
-	gl_Position = vec4((2.0 * uv.x) - 1.0, -2.0 * uv.y, 0, 1);
+	gl_PointSize = 1.0;
+	gl_Position = vec4((2.0 * uv.x) - 1.0, (2.0 * uv.y) - 1.0, 0, 1);
 	pixelData = vec4(newX, newY, point.ba);
 }
